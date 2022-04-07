@@ -19,6 +19,8 @@ namespace App2
 
         public MainPage()
         {
+            Title = "Notes";
+
             BackgroundColor = Color.PowderBlue;
 
             BindingContext = new MainPageViewModel();
@@ -34,7 +36,7 @@ namespace App2
                 BackgroundColor = Color.White,
                 Margin = new Thickness(10)
             };
-            noteEditor.SetBinding(Editor.TextProperty, "NoteText");
+            noteEditor.SetBinding(Editor.TextProperty, nameof(MainPageViewModel.NoteText));
 
             saveButton = new Button
             {
@@ -44,7 +46,7 @@ namespace App2
                 Margin = new Thickness(10)
             };
             //saveButton.Clicked += SaveButton_Clicked;
-            saveButton.SetBinding(Button.CommandProperty, "SaveNotesCommand");
+            saveButton.SetBinding(Button.CommandProperty, nameof(MainPageViewModel.SaveNoteCommand));
 
             deleteButton = new Button
             {
@@ -54,7 +56,7 @@ namespace App2
                 Margin = new Thickness(10)
             };
             //deleteButton.Clicked += DeleteButton_Clicked;
-            deleteButton.SetBinding(Button.CommandProperty, "EraseNotesCommand");
+            deleteButton.SetBinding(Button.CommandProperty, nameof(MainPageViewModel.EraseNotesCommand));
 
             textLabel = new Label
             {
@@ -65,8 +67,11 @@ namespace App2
             var collectionView = new CollectionView
             {
                 ItemTemplate = new NotesTemplate(),
+                SelectionMode = SelectionMode.Single
             };
-            collectionView.SetBinding(CollectionView.ItemsSourceProperty, "NotesCollection");
+            collectionView.SetBinding(CollectionView.ItemsSourceProperty, nameof(MainPageViewModel.Notes));
+            collectionView.SetBinding(CollectionView.SelectedItemProperty, nameof(MainPageViewModel.SelectedNote));
+            collectionView.SetBinding(CollectionView.SelectionChangedCommandProperty, nameof(MainPageViewModel.NoteSelectedCommand));
 
             var grid = new Grid
             {

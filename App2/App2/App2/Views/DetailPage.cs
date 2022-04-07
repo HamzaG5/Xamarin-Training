@@ -10,16 +10,9 @@ namespace App2.Views
 {
     public class DetailPage : ContentPage
     {
-        public DetailPage()
+        public DetailPage(DetailPageViewModel viewModel)
         {
-            /*Content = new StackLayout
-            {
-                Children = {
-                    new Label { Text = "Welcome to Xamarin.Forms!" }
-                }
-            };*/
-
-            //BindingContext = viewModel;
+            BindingContext = viewModel;
 
             Title = "Notes Detail";
 
@@ -29,8 +22,9 @@ namespace App2.Views
             {
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.CenterAndExpand,
+                FontSize = 20
             };
-            textLabel.SetBinding(Label.TextProperty, nameof(DetailPageViewModel));
+            textLabel.SetBinding(Label.TextProperty, nameof(DetailPageViewModel.NoteText));
 
             var exitButton = new Button
             {
@@ -41,10 +35,16 @@ namespace App2.Views
                 TextColor = Color.White,
                 FontSize = 20
             };
-            exitButton.SetBinding(Button.CommandProperty, nameof(DetailPageViewModel.BackButtonCommand));
+            exitButton.SetBinding(Button.CommandProperty, nameof(DetailPageViewModel.ExitCommand));
 
+            var stackLayout = new StackLayout
+            {
+                Margin = new Thickness(20, 40)
+            };
+            stackLayout.Children.Add(textLabel);
+            stackLayout.Children.Add(exitButton);
 
-
+            Content = stackLayout;
         }
     }
 }

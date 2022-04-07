@@ -1,4 +1,5 @@
 ﻿using App2.Models;
+using App2.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +11,18 @@ namespace App2.ViewModels
 {
     public class MainPageViewModel : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ObservableCollection<NoteModel> Notes { get; }
+
+        public Command SaveNoteCommand { get; }
+
+        public Command EraseNotesCommand { get; }
+
+        public Command NoteSelectedCommand { get; }
+
+
+
         private string noteText;
 
         public string NoteText
@@ -18,39 +31,51 @@ namespace App2.ViewModels
             set
             {
                 noteText = value;
-                var args = new PropertyChangedEventArgs(nameof(NoteText));
-                PropertyChanged?.Invoke(this, args);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NoteText)));
+
+                SaveNoteCommand.ChangeCanExecute();
+            }
+        }
+
+        NoteModel selectedNote;
+        public NoteModel SelectedNote 
+        { 
+            get => selectedNote;
+            set
+            {
+                selectedNote = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedNote)));
             }
         }
 
         public MainPageViewModel()
         {
-            NotesCollection = new ObservableCollection<NoteModel>();
+            Notes = new ObservableCollection<NoteModel>();
 
-            SaveNotesCommand = new Command(() =>
+            SaveNoteCommand = new Command(() =>
             {
-                var note = new NoteModel
+                Notes.Add(new NoteModel { Text = NoteText });
+                NoteText = string.Empty;
+            },
+            () => !string.IsNullOrEmpty(NoteText));
+
+            EraseNotesCommand = new Command(() => Notes.Clear());
+
+            NoteSelectedCommand = new Command (async () =>
+            {
+                if (SelectedNote is null)
+                    return;
+
+                var detailViewModel = new DetailPageViewModel
                 {
-                    Text = NoteText
+                    NoteText = SelectedNote.Text
                 };
 
-                NotesCollection.Add(note);
-                NoteText = string.Empty;
+                await Application.Current.MainPage.Navigation.PushAsync(new DetailPage(detailViewModel));
+
+                SelectedNote = null;
             });
 
-            EraseNotesCommand = new Command(() =>
-            {
-                NotesCollection.Clear();
-            });
         }
-        
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public ObservableCollection<NoteModel> NotesCollection { get; }
-
-        public Command SaveNotesCommand { get; }
-
-        public Command EraseNotesCommand { get; }
-
     }
 }
